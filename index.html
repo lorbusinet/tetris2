@@ -67,6 +67,7 @@
       <div class="keys">
         <b>← →</b> déplacer<br>
         <b>↓</b> descente douce<br>
+        <b>A</b> remonter d'un niveau<br>
         <b>↑ / X</b> rotation<br>
         <b>Z</b> rotation inverse<br>
         <b>Espace</b> chute directe<br>
@@ -79,6 +80,7 @@
     <button data-act="left">◀</button>
     <button data-act="rotate">⟳</button>
     <button data-act="right">▶</button>
+    <button data-act="up">▲</button>
     <button data-act="soft">▼</button>
     <button data-act="drop">⤓</button>
     <button data-act="hold">H</button>
@@ -172,6 +174,14 @@ function softDrop() {
   if (!collides(piece.shape, piece.x, piece.y + 1)) { piece.y++; score += 1; updateHUD(); }
   else lock();
   dropTimer = 0;
+}
+
+function moveUp() {
+  // Remonte la pièce d'une ligne, sans sortir du haut du plateau
+  const ny = piece.y - 1;
+  for (let r = 0; r < piece.shape.length; r++)
+    if (piece.shape[r].some(Boolean) && ny + r < 0) return;
+  if (!collides(piece.shape, piece.x, ny)) { piece.y = ny; dropTimer = 0; }
 }
 
 function hardDrop() {
@@ -349,6 +359,7 @@ function action(act) {
     case 'left': move(-1); break;
     case 'right': move(1); break;
     case 'soft': softDrop(); break;
+    case 'up': moveUp(); break;
     case 'drop': hardDrop(); break;
     case 'rotate': tryRotate(1); break;
     case 'rotateCCW': tryRotate(-1); break;
@@ -359,7 +370,7 @@ function action(act) {
 
 document.addEventListener('keydown', e => {
   const map = {
-    ArrowLeft: 'left', ArrowRight: 'right', ArrowDown: 'soft', ArrowUp: 'rotate',
+    ArrowLeft: 'left', ArrowRight: 'right', ArrowDown: 'soft', ArrowUp: 'rotate', KeyA: 'up',
     KeyX: 'rotate', KeyZ: 'rotateCCW', KeyW: 'rotateCCW', Space: 'drop',
     KeyC: 'hold', ShiftLeft: 'hold', ShiftRight: 'hold', KeyP: 'pause', Escape: 'pause',
   };
